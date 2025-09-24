@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "132667249253",
+    "project_id": "trabajosemana6aiep",
+    "storage_bucket": "trabajosemana6aiep.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132667249253:android:9570e16184ae332cb5ac8c",
+        "android_client_info": {
+          "package_name": "cl.hugo.miprimeraaplicacion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWZ-eLtZFD--dMPQj4ge-aufpC39T3kzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
