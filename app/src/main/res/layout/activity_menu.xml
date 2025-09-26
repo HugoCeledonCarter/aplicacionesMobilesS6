@@ -1,19 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context=".MenuActivity">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/txt_unmensaje"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Esperando ubicación..."
-        android:textSize="18sp"
-        android:padding="16dp"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</LinearLayout>
+        <!-- Ubicación GPS en tiempo real -->
+        <TextView
+            android:id="@+id/tv_ubicacion"
+            android:text="Ubicación: N/D"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:drawableLeft="@android:drawable/ic_menu_mylocation"
+            android:drawablePadding="8dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Cálculo de despacho -->
+        <TextView
+            android:text="Cálculo de despacho"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/et_total"
+            android:hint="Total compra (CLP) > 0"
+            android:inputType="number"
+            android:maxLength="9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/et_distancia"
+            android:hint="Distancia (km) > 0"
+            android:inputType="numberDecimal"
+            android:maxLength="6"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_calcular"
+            android:text="Calcular"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_resultado"
+            android:text="Costo de despacho: $0"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

@@ -1,99 +1,106 @@
 package cl.hugo.miprimeraaplicacion;
+// Paquete donde se encuentra la clase MainActivity
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    // Definición de variables gráficas (campos y botones)
+    private EditText nombreInput, emailInput, passwordInput;
+    private Button registerButton, loginButton;
 
-    private EditText emailInput, passwordInput;
-    private Button loginButton, registerButton;
+    // Variables de Firebase (autenticación y base de datos)
     private FirebaseAuth mAuth;
+    private DatabaseReference databaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        // Asigna el diseño (layout) de esta pantalla a activity_main.xml
 
-        // Inicializar FirebaseAuth
-        mAuth = FirebaseAuth.getInstance();
+        // Inicialización de Firebase
+        mAuth = FirebaseAuth.getInstance(); // Maneja usuarios y autenticación
+        databaseRef = FirebaseDatabase.getInstance().getReference("usuarios");
+        // Referencia a la rama "usuarios" en Realtime Database
 
+        // Enlazando elementos de la interfaz con el código
+        nombreInput = findViewById(R.id.et_nombre);
         emailInput = findViewById(R.id.et_email);
         passwordInput = findViewById(R.id.et_password);
-        loginButton = findViewById(R.id.btn_login);
         registerButton = findViewById(R.id.btn_register);
-
-        // Botón de login
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginUser();
-            }
-        });
+        loginButton = findViewById(R.id.btn_login);
 
         // Botón de registro
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerUser();
-            }
-        });
+        registerButton.setOnClickListener(v -> registerUser());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // Botón de login
+        loginButton.setOnClickListener(v -> loginUser());
+    }
+
+    // Método para registrar usuarios
+    private void registerUser() {
+        String nombre = nombreInput.getText().toString();
+        String email = emailInput.getText().toString();
+        String password = passwordInput.getText().toString();
+
+        // Validación de campos vacíos
+        if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Registro en Firebase Authentication
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(MainActivity.this, "Usuario registrado correctamente", Toast.LENGTH_SHORT).show();
+
+                // Guardar datos adicionales en Firebase Realtime Database
+                String userId = mAuth.getCurrentUser().getUid();
+                Map<String, Object> usuarioMap = new HashMap<>();
+                usuarioMap.put("nombre", nombre);
+                usuarioMap.put("email", email);
+                usuarioMap.put("password", password); // Solo práctica, no recomendado en producción
+
+                databaseRef.child(userId).setValue(usuarioMap);
+            } else {
+                Toast.makeText(MainActivity.this, "Error en el registro", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
+    // Método para iniciar sesión
     private void loginUser() {
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Debes ingresar email y contraseña", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ingresa email y contraseña", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Validación contra Firebase Authentication
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(MainActivity.this, "Login exitoso", Toast.LENGTH_SHORT).show();
+
+                // Si el login es correcto, abre la segunda pantalla (MenuActivity)
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
             } else {
                 Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_SHORT).show();
-                Log.e("FIREBASE", "Error: ", task.getException());
-            }
-        });
-    }
-
-    private void registerUser() {
-        String email = emailInput.getText().toString();
-        String password = passwordInput.getText().toString();
-
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Debes ingresar email y contraseña", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(MainActivity.this, "Usuario registrado correctamente", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Error en el registro", Toast.LENGTH_SHORT).show();
             }
         });
     }
